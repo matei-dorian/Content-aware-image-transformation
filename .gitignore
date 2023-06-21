@@ -1,0 +1,34 @@
+# Byte-compiled / optimized files
+*.py[cod]
+__pycache__/
+
+# C extensions
+*.so
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Virtual environments
+venv/
+env/
+
+# IDE specific files
+.idea/
+*.iml
+*.iws
+*.ipr
+*.bak
+
+# PyCharm specific files
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dictionaries/
+.idea/vcs.xml
+.idea/jsLibraryMappings.xml
+.idea/pyCharmSettings.xml
+
+# Miscellaneous
+*.log
+*.pydevproject

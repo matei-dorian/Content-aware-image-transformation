@@ -1,0 +1,24 @@
+{
+  "num_epochs": 100,
+  "decay_epochs": 100,
+  "starting_epoch": 1,
+  "resume_training": false,
+
+  "pool_size": 50,
+  "beta1": 0.5,
+  "learning_rate": 0.0002,
+  "lambda_identity": 5,
+  "lambda_gan": 1,
+  "lambda_cycle": 10,
+
+  "real_root": "/content/gdrive/MyDrive/Licenta/best_dataset_ever/real_faces",
+  "anime_root": "/content/gdrive/MyDrive/Licenta/best_dataset_ever/anime_faces",
+  "num_workers": 2,
+  "batch_size": 4,
+  "save_model": true,
+
+  "models_root": "/content/gdrive/MyDrive/Licenta/Modelsv2/",
+
+  "save_animes": "/content/gdrive/MyDrive/Licenta/Resultsv2/Anime",
+  "save_reals": "/content/gdrive/MyDrive/Licenta/Resultsv2/Real"
+}
