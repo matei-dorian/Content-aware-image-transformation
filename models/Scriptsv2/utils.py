@@ -4,6 +4,7 @@ import functools
 import torch.nn as nn
 
 import json
+import math
 import torch
 import random
 import numpy as np
@@ -18,7 +19,7 @@ def get_scheduler(optimizer, last_epoch, decay_epochs, type="step"):
         return 1.0 - factor / float(decay_epochs + 1)  # +1 so that lr will never truly be 0
       return lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda_rule)
     else:
-      return lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.2, threshold=0.01, patience=5)
+      return lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, threshold=0.01, patience=5)
 
 
 
@@ -38,7 +39,7 @@ def get_norm_layer(norm_type='batch'):
 
 class Options:
     def __init__(self):
-        f = open("/content/gdrive/MyDrive/Licenta/Scriptsv2/options.json")
+        f = open("./Scriptsv2/options.json")
         options = json.load(f)
         f.close()
 
@@ -50,21 +51,20 @@ class Options:
 
 
 class DecayingBlur:
-    def __init__(self, kernel_size=11, max_sigma=50, num_epochs=100, step=30):
+    def __init__(self, kernel_size=13, max_sigma=40, num_epochs=150):
         self.kernel_size = kernel_size
         self.max_sigma = max_sigma
         self.num_epochs = num_epochs
-        self.step = step
+        self.step = num_epochs // 4
 
     def __call__(self, img, epoch):
-        if epoch % self.step == 0 and self.kernel_size > 3:
-          self.kernel_size -= 2 
-        decaying_factor = (self.num_epochs - epoch) / (self.num_epochs + 1)
-        if decaying_factor <= 0:
+        if epoch >= self.num_epochs:
             return img
-
+        
+        decaying_factor = (self.num_epochs - epoch) / (self.num_epochs + 1)  
         sigma = self.max_sigma * decaying_factor
-        kernel_size = self.kernel_size
+        #print(sigma)
+        kernel_size = self.kernel_size - 2 * (epoch // self.step)
 
         # Apply Gaussian blur
         img = transforms.GaussianBlur(kernel_size=kernel_size, sigma=sigma)(img)
@@ -73,7 +73,7 @@ class DecayingBlur:
 
 transform = transforms.Compose([
     transforms.ToPILImage(),
-    transforms.Resize((286, 286)),
+    transforms.Resize((290, 290)),
     transforms.RandomCrop(size=256),
     transforms.RandomHorizontalFlip(p=0.5),
     transforms.RandomRotation(degrees=10),
@@ -81,6 +81,19 @@ transform = transforms.Compose([
     transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
 ])
 
+
+eval_transform = transforms.Compose([
+    transforms.ToPILImage(),
+    transforms.Resize((256, 256)),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+])
+
+predict_transform = transforms.Compose([
+    transforms.Resize((256, 256)),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+])
 
 def seed_everything(seed=13):
     random.seed(seed)

@@ -14,7 +14,7 @@ class ImagePool:
         return_images = []
         for image in images:
             image = torch.unsqueeze(image.data, 0)
-            if not self.__is_full():
+            if self.__is_full():
                 p = random.uniform(0, 1)
                 if p > 0.5:
                     idx = random.randint(0, self.pool_size - 1)
@@ -31,12 +31,22 @@ class ImagePool:
         return return_images
 
     def __add_to_pool(self, image, replace_idx=None):
-        if not replace_idx:
+        if replace_idx is None:
             self.images.append(image)
             return
         self.images[replace_idx] = image
 
     def __is_full(self):
-        return len(self.images) < self.pool_size
+        return len(self.images) >= self.pool_size
+    
+    def state_dict(self):
+        return {
+            'pool_size': self.pool_size,
+            'images': self.images
+        }
+
+    def load_state_dict(self, state_dict):
+        self.pool_size = state_dict['pool_size']
+        self.images = state_dict['images']
 
 

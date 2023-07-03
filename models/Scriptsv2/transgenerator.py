@@ -60,7 +60,7 @@ class Generator(nn.Module):
 
         # residual transformers
         transformer_layer = nn.TransformerEncoderLayer(
-            1024,
+            4096,
             8,
             2048,
             activation="gelu",
@@ -102,8 +102,10 @@ class Generator(nn.Module):
 
         seq_len = height * width
         x = x.view(batch_size, channels, seq_len)  # reshape to (batch_size, channels, seq_len)
-        pos_enc = self.get_positional_encoding(channels, seq_len)
+        pos_enc = self.get_positional_encoding(channels, seq_len, x.device)
+        print(x.shape, pos_enc.shape)
         x = x + pos_enc
+        print(x.shape)
         x = self.transformer_encoder(x)
         x = x - pos_enc
         x = x.view(batch_size, channels, height, width)  # reshape back to (batch_size, channels, height, width)
@@ -113,7 +115,7 @@ class Generator(nn.Module):
         return x
 
 
-    def get_positional_encoding(self, seq_len, embedding_dim):
+    def get_positional_encoding(self, seq_len, embedding_dim, device):
         pos_enc = torch.zeros(seq_len, embedding_dim)
 
         # calculate angles for each position and dimension
@@ -126,4 +128,4 @@ class Generator(nn.Module):
         # add batch dimension
         pos_enc = pos_enc.unsqueeze(0)
 
-        return pos_enc
+        return pos_enc.to(device)

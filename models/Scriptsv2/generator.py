@@ -31,6 +31,7 @@ class ResidualBlock(nn.Module):
         super().__init__()
         self.block = nn.Sequential(
             ConvBlock(channels, channels, kernel_size=3, norm_layer=norm_layer, bias=use_bias),
+            #nn.Dropout(0.5),
             ConvBlock(channels, channels, use_act=False, kernel_size=3, norm_layer=norm_layer, bias=use_bias)
         )
 
@@ -52,7 +53,7 @@ class Generator(nn.Module):
 
         # add down-sampling
         down_sampling = []
-        kwargs = {"kernel_size": 3, "stride": 2, "padding": 1, "bias": use_bias}
+        kwargs = {"kernel_size": 3, "stride": 2, "bias": use_bias}
         for i in range(2):  # add downsampling layers
             factor = 2 ** i
             down_sampling.append(ConvBlock(num_features * factor, num_features * factor * 2, 0, **kwargs))
